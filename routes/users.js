@@ -68,7 +68,7 @@ var checkUser = function (req, res, next) {
 /*********************/
 /* GET all users. */
 /*********************/
-router.get('/', function(req, res, next) {
+router.get('/', auth, checkAdmin, function(req, res, next) {
 	// Query db using mongoose find method
 	User.find( function (err, users) {
 		// Return any errors
@@ -81,7 +81,7 @@ router.get('/', function(req, res, next) {
 /********************/
 /* POST a new user */
 /********************/
-router.post('/', function (req, res, next) {
+router.post('/', auth, checkAdmin, function (req, res, next) {
 	// Check for required fields
 	if (!req.body.username || req.body.username === '') {
 		return res.status(400).json({
@@ -111,13 +111,22 @@ router.post('/', function (req, res, next) {
 	user.setPassword(req.body.password);
 
 	// Set first = first from form
-	user.first = request.body.first;
+	user.first = req.body.first;
 
 	// Set last = last from form
-	user.last = request.body.last;
+	user.last = req.body.last;
+
+	// Set jobTitle = jobTitle from form
+	user.jobTitle = req.body.jobTitle;
+
+	// Set phoneNumber = phoneNumber from form
+	user.phoneNumber = req.body.phoneNumber;
+
+	// Set phoneExt = phoneExt from form
+	user.phoneExt = req.body.phoneExt;
 
 	// Set email = email from form
-	user.email = request.body.email;
+	user.email = req.body.email;
 
 	// Add role from form to user roles array
 	if (req.body.role) { user.roles.push(req.body.role); }
@@ -158,7 +167,7 @@ router.param('user', function (req, res, next, id) {
 /*********************************/
 /* GET a single user by _id */
 /*********************************/
-router.get('/:user', function (req, res, next) {
+router.get('/:user', auth, checkAdmin, function (req, res, next) {
 
 	// Return the user from the route parameter
 	return res.json(req.user);
@@ -168,7 +177,7 @@ router.get('/:user', function (req, res, next) {
 /**************************/
 /* DELETE a user */
 /**************************/
-router.delete('/:user', function (req, res, next) {
+router.delete('/:user', auth, checkAdmin, function (req, res, next) {
 
 	// Remove user using mongoose remove method
 	req.user.remove(function (err, user) {
@@ -183,7 +192,7 @@ router.delete('/:user', function (req, res, next) {
 /************************/
 /* UPDATE a user */
 /************************/
-router.put('/:user', function (req, res, next) {
+router.put('/:user', auth, checkAdmin, function (req, res, next) {
 
 	User.findById(req.user._id, function (err, user) {
 
@@ -202,8 +211,17 @@ router.put('/:user', function (req, res, next) {
 		// Update e-mail if set in form
 		if (req.body.email) { user.email = req.body.email; }
 
+		// Update jobTitle if set in form
+		if (req.body.jobTitle) { user.jobTitle = req.body.jobTitle; }
+
+		// Update phoneNumber if set in form
+		if (req.body.phoneNumber) { user.phoneNumber = req.body.phoneNumber; }
+
+		// Update phoneExt if set in form
+		if (req.body.phoneExt) { user.phoneExt = req.body.phoneExt; }
+
 		// Add role if set in form
-		if (req.body.role) { user.roles.push(req.body.role); }
+		if (req.body.role && user.roles.indexOf(req.body.role) > -1) { user.roles.push(req.body.role); }
 
 		// Save changes to user using the mongoose save method
 		user.save(function (err) {
@@ -229,7 +247,7 @@ router.get('/:user/roles', function (req, res, next) {
 /*************************/
 /* Revoke a role from a user */
 /*******************************/
-router.put('/:user/roles', function (req, res, next) {
+router.put('/:user/roles', auth, checkAdmin, function (req, res, next) {
 
 	User.findById(req.user._id, function (err, user) {
 
@@ -290,6 +308,9 @@ router.post('/register', function (req, res, next) {
 	user.first = req.body.first;
 	user.last = req.body.last;
 	user.email = req.body.email;
+	user.jobTitle = req.body.jobTitle;
+	user.phoneNumber = req.body.phoneNumber;
+	user.phoneExt = req.body.phoneExt;
 
 	user.setPassword(req.body.password);
 

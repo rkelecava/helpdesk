@@ -5,6 +5,7 @@ var crypto = require('crypto');
 var SetupSchema = new mongoose.Schema({
 	name: {type: String, unique: true},
 	isComplete: {type: Boolean, default: true},
+	companyName: String,
 	smtpServer: String,
 	smtpUser: String,
 	smtpPwHash: String,
