@@ -14,6 +14,7 @@ var passport = require('passport');
 
 require('./models/Users');
 require('./models/Setup');
+require('./models/Requests');
 
 require('./config/passport');
 
@@ -24,6 +25,7 @@ mongoose.connect('mongodb://localhost/helpdesk');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var setup = require('./routes/setup');
+var requests = require('./routes/requests');
 
 var app = express();
 
@@ -45,6 +47,7 @@ app.use(passport.initialize());
 app.use('/', routes);
 app.use('/users', users);
 app.use('/setup', setup);
+app.use('/requests', requests);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

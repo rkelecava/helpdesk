@@ -184,8 +184,13 @@ router.delete('/:user', auth, checkAdmin, function (req, res, next) {
 		// Return any errors
 		if (err) { return next(err); }
 
-		// If no errors, return a message stating that the user has been removed
-		res.json({message: 'User removed'});
+		// Query db using mongoose find method
+		User.find( function (err, users) {
+			// Return any errors
+			if (err) { return next(err); }
+			// If there are no errors, return the list of users
+			return res.json(users);
+		});
 	});
 });
 
