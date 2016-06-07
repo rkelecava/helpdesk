@@ -8,22 +8,24 @@ var SetupSchema = new mongoose.Schema({
 	companyName: String,
 	smtpServer: String,
 	smtpUser: String,
-	smtpPwHash: String,
-	smtpPwSalt: String
+	smtpPw: String
 });
 
-/* Add new methods to our schema for setting and validating
+/* Add new methods to our schema for encrypting and decrypting
 the smtp server password using the built-in 'crypto' library in Nodejs */
-SetupSchema.methods.setPassword = function (password) {
-	this.smtpPwSalt = crypto.randomBytes(16).toString('hex');
 
-	this.smtpPwHash = crypto.pbkdf2Sync(password, this.smtpPwSalt, 1000, 64).toString('hex');
+SetupSchema.methods.encrypt = function (password) {
+  var cipher = crypto.createCipher('aes-256-ctr', process.env['JWT_SECRET']);
+  var crypted = cipher.update(password,'utf8','hex');
+  crypted += cipher.final('hex');
+  return crypted;
 };
 
-SetupSchema.methods.validPassword = function (password) {
-	var hash = crypto.pbkdf2Sync(password, this.smtpPwSalt, 1000, 64).toString('hex');
-
-	return this.smtpPwHash === hash;
+SetupSchema.methods.decrypt = function () {
+  var decipher = crypto.createDecipher('aes-256-ctr', process.env['JWT_SECRET']);
+  var dec = decipher.update(this.smtpPw,'hex','utf8');
+  dec += decipher.final('utf8');
+  return dec;
 };
 
 /* Create new Setup model using the SetupSchema we just created above */

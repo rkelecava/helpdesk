@@ -12,6 +12,10 @@ var User = mongoose.model('User');
 to access our db */
 var Setup = mongoose.model('Setup');
 
+/*Include the Request mongoose model that our setup routes will be using
+to access our db */
+var Request = mongoose.model('Request');
+
 /*********************/
 /* GET the setup information. */
 /*********************/
@@ -103,6 +107,9 @@ router.post('/', function (req, res, next) {
 	// Add the admin role to user roles array
 	user.roles.push('admin');
 
+	// Set this first user as a site admin
+	user.isSiteAdmin = true;
+
 	// Set the name of the setup config, so that we can check for unique
 	setup.name = 'main';
 
@@ -119,7 +126,7 @@ router.post('/', function (req, res, next) {
 	setup.smtpUser = req.body.smtpUser;
 
 	// Set smtpPw = smtpPw from form
-	setup.smtpPw = req.body.smtpPw;
+	setup.smtpPw = setup.encrypt(req.body.smtpPw);
 
 	setup.save(function (err) {
 		// Return any errors
@@ -128,50 +135,58 @@ router.post('/', function (req, res, next) {
 		// Check if user already exists
 		User.findOne({username: req.body.username}, function (err, user) {
 
-			// Set userExists flag to true
-			var userExists = 1;
+			if (!user) {
+				return next();
+			} else {
+				// Set userExists flag to true
+				var userExists = 1;
 
-			// Update username if set in form
-			if (req.body.username) { user.username = req.body.username; }
+				// Update username if set in form
+				if (req.body.username) { user.username = req.body.username; }
 
-			// Update password if set in form
-			if (req.body.password) { user.setPassword(req.body.password); }
+				// Update password if set in form
+				if (req.body.password) { user.setPassword(req.body.password); }
 
-			// Update first if set in form
-			if (req.body.first) { user.first = req.body.first; }
+				// Update first if set in form
+				if (req.body.first) { user.first = req.body.first; }
 
-			// Update last if set in form
-			if (req.body.last) { user.last = req.body.last; }
+				// Update last if set in form
+				if (req.body.last) { user.last = req.body.last; }
 
-			// Update e-mail if set in form
-			if (req.body.email) { user.email = req.body.email; }
+				// Update e-mail if set in form
+				if (req.body.email) { user.email = req.body.email; }
 
-			// Update jobTitle if set in form
-			if (req.body.jobTitle) { user.jobTitle = req.body.jobTitle; }
+				// Update jobTitle if set in form
+				if (req.body.jobTitle) { user.jobTitle = req.body.jobTitle; }
 
-			// Update phoneNumber if set in form
-			if (req.body.phoneNumber) { user.phoneNumber = req.body.phoneNumber; }
+				// Update phoneNumber if set in form
+				if (req.body.phoneNumber) { user.phoneNumber = req.body.phoneNumber; }
 
-			// Update phoneExt if set in form
-			if (req.body.phoneExt) { user.phoneExt = req.body.phoneExt; }
+				// Update phoneExt if set in form
+				if (req.body.phoneExt) { user.phoneExt = req.body.phoneExt; }
 
-			// Add role if set in form
-			if (req.body.role && user.roles.indexOf('admin') > -1) { user.roles.push('admin'); }
+				// Update site admin flag if set in form
+				if (req.body.isSiteAdmin) { user.isSiteAdmin = req.body.isSiteAdmin; }
 
-			// Save changes to user using the mongoose save method
-			user.save(function (err) {
-				// Return any errors
-				if (err) { return next(err); }
+				// Add role if set in form
+				if (req.body.role && user.roles.indexOf('admin') > -1) { user.roles.push('admin'); }
 
-				/* If no errors, generate a new JWT(jsonwebtoken) for the
-				newly added user using the generateJWT method defined in the User Schema */
-				return res.json({token: user.generateJWT()});
-			});
+				// Save changes to user using the mongoose save method
+				user.save(function (err) {
+					// Return any errors
+					if (err) { return next(err); }
+
+					/* If no errors, generate a new JWT(jsonwebtoken) for the
+					newly added user using the generateJWT method defined in the User Schema */
+					return res.json({token: user.generateJWT()});
+				});
+			}
+
 
 		});
 
 		// If no userExists, add a new user
-		if (userExists == 1) {
+		if (userExists == -1) {
 
 			// if no errors with saving the setup, save the admin user
 			user.save(function (err) {
@@ -220,6 +235,11 @@ router.get('/:setup', function (req, res, next) {
 	return res.json(req.setup);
 });
 
+router.get('/:setup/pw', function (req, res, next) {
+	var setup = new Setup(req.setup);
+	return res.json({password: setup.decrypt()});
+});
+
 
 /**************************/
 /* DELETE a setup */
@@ -230,6 +250,18 @@ router.delete('/:setup', function (req, res, next) {
 	req.setup.remove(function (err, setup) {
 		// Return any errors
 		if (err) { return next(err); }
+
+		User.remove({}, function (err) {
+			if (err) { return next(err); }
+		});
+
+		Setup.remove({}, function (err) {
+			if (err) { return next(err); }
+		});
+
+		Request.remove({}, function (err) {
+			if (err) { return next(err); }
+		});
 
 		// If no errors, return a message stating that the setup has been removed
 		res.json({message: 'Setup removed'});
@@ -254,7 +286,7 @@ router.put('/:setup', function (req, res, next) {
 		if (req.body.companyName) { setup.companyName = req.body.companyName; }
 
 		// Update smtpPw if set in form
-		if (req.body.smtpPw) { setup.setPassword(req.body.smtpPw); }
+		if (req.body.smtpPw) { setup.smtpPw = setup.encrypt(req.body.smtpPw); }
 
 
 		// Save changes to setup using the mongoose save method

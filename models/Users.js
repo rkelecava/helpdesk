@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var crypto = require('crypto');
 var jwt = require('jsonwebtoken');
+var nodemailer = require('nodemailer');
 
 /* Create a new mongoose schema for our Users model */
 var UserSchema = new mongoose.Schema({
@@ -12,6 +13,7 @@ var UserSchema = new mongoose.Schema({
 	phoneExt: String,
 	username: {type: String, lowercase: true, unique: true},
 	roles: {type: [String], default: 'guest' },
+	isSiteAdmin: {type: Boolean, default: false},
 	salt: String,
 	hash: String
 });
@@ -54,8 +56,55 @@ UserSchema.methods.generateJWT = function () {
 		email: this.email,
 		username: this.username,
 		roles: this.roles,
+		isSiteAdmin: this.isSiteAdmin,
 		exp: parseInt(exp.getTime() / 1000),
 	}, process.env.JWT_SECRET);
+};
+
+
+UserSchema.methods.sendMailAdmin = function (setup, pw, mail) {
+
+	var transporter = nodemailer.createTransport('smtp://'+setup.smtpUser+':'+pw+'@'+setup.smtpServer);
+
+	// setup e-mail data with unicode symbols
+	var mailOptions = {
+    	from: setup.companyName+' Helpdesk <'+setup.smtpUser+'>', // sender address
+    	to: mail[0].to, // list of receivers
+    	subject: mail[0].subject, // Subject line
+    	text: mail[0].plainText, // plaintext body
+    	html: '<a href="http://localhost/#/confirm/'+this._id+'">Confirm</a> OR <a href="http://localhost/#/deny/'+this._id+'">Deny</a>' // html body
+	};
+
+	// send mail with defined transport object
+	transporter.sendMail(mailOptions, function(error, info){
+    	if(error){
+        	return console.log(error);
+    	}
+    	console.log('Message sent: ' + info.response);
+	});
+};
+
+
+UserSchema.methods.sendMail = function (setup, pw, mail) {
+
+	var transporter = nodemailer.createTransport('smtp://'+setup.smtpUser+':'+pw+'@'+setup.smtpServer);
+
+	// setup e-mail data with unicode symbols
+	var mailOptions = {
+    	from: setup.companyName+' Helpdesk <'+setup.smtpUser+'>', // sender address
+    	to: mail[0].to, // list of receivers
+    	subject: mail[0].subject, // Subject line
+    	text: mail[0].plainText, // plaintext body
+    	html: mail[0].html // html body
+	};
+
+	// send mail with defined transport object
+	transporter.sendMail(mailOptions, function(error, info){
+    	if(error){
+        	return console.log(error);
+    	}
+    	console.log('Message sent: ' + info.response);
+	});
 };
 
 

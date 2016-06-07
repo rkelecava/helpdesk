@@ -12,6 +12,10 @@ var jwt = require('express-jwt');
 to access our db */
 var User = mongoose.model('User');
 
+/*Include the Setup mongoose model that our users routes will be using
+to access our db */
+var Setup = mongoose.model('Setup');
+
 /****************************/
 /* Middleware */
 /*****************************/
@@ -226,7 +230,7 @@ router.put('/:user', auth, checkAdmin, function (req, res, next) {
 		if (req.body.phoneExt) { user.phoneExt = req.body.phoneExt; }
 
 		// Add role if set in form
-		if (req.body.role && user.roles.indexOf(req.body.role) > -1) { user.roles.push(req.body.role); }
+		if (req.body.role && user.roles.indexOf(req.body.role) == -1) { user.roles.push(req.body.role); }
 
 		// Save changes to user using the mongoose save method
 		user.save(function (err) {
@@ -275,6 +279,46 @@ router.put('/:user/roles', auth, checkAdmin, function (req, res, next) {
 });
 
 /************************/
+/* Confirm the newly registered user */
+/*******************************/
+router.put('/:user/confirm', auth, checkAdmin, function (req, res, next) {
+
+	User.findById(req.user._id, function (err, user) {
+
+		// Confirm user access
+		if (user.roles.indexOf('user') == -1) { user.roles.push('user'); }
+
+		var setup = new Setup();
+
+		var mail = Array({
+			to: user.email,
+			subject: 'Registration confirmed',
+			plainText: 'You have been granted access to submit new helpdesk requests online.',
+			html: 'You have been granted access to submit new helpdesk requests online.'
+		});
+
+		// Save changes to user using the mongoose save method
+		user.save(function (err) {
+			// Return any errors
+			if (err) { return next(err); }
+
+			Setup.findOne({name: 'main'}, function (err, setup) {
+				if (err) { return next(err); }
+
+				var pw = setup.decrypt();
+
+				user.sendMail(setup, pw, mail);
+			});
+
+			/* If no errors, generate a new JWT(jsonwebtoken) for the
+			newly added user using the generateJWT method defined in the User Schema */
+			return res.json({message: user.first+' '+user.last+' has been confirmed'});
+		});
+	});
+
+});
+
+/************************/
 /* Route to login a user */
 /**************************/
 router.post('/login', function (req, res, next) {
@@ -309,6 +353,16 @@ router.post('/register', function (req, res, next) {
 
 	var user = new User();
 
+	var setup = new Setup();
+
+
+
+	var mail = Array({
+		to: 'rkelecava@scottelectricusa.com',
+		subject: 'New Registration: '+req.body.first+' '+req.body.last,
+		plainText: 'Please confirm or deny this user\'s access to the system.'
+	});
+
 	user.username = req.body.username;
 	user.first = req.body.first;
 	user.last = req.body.last;
@@ -321,6 +375,14 @@ router.post('/register', function (req, res, next) {
 
 	user.save(function (err) {
 		if (err) { return next(err); }
+
+		Setup.findOne({name: 'main'}, function (err, setup) {
+			if (err) { return next(err); }
+
+			var pw = setup.decrypt();
+
+			user.sendMailAdmin(setup, pw, mail);
+		});
 
 		return res.json({token: user.generateJWT()});
 	});
