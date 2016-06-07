@@ -319,6 +319,24 @@ router.put('/:user/confirm', auth, checkAdmin, function (req, res, next) {
 });
 
 /************************/
+/* Deny the newly registered user */
+/*******************************/
+router.put('/:user/deny', auth, checkAdmin, function (req, res, next) {
+
+	var fN = req.user.first;
+	var lN = req.user.last;
+
+	// Remove user using mongoose remove method
+	req.user.remove(function (err, user) {
+		// Return any errors
+		if (err) { return next(err); }
+
+		return res.json({message: fN+' '+lN+' has been removed'});
+	});
+
+});
+
+/************************/
 /* Route to login a user */
 /**************************/
 router.post('/login', function (req, res, next) {
