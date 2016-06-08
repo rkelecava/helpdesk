@@ -29,6 +29,36 @@ router.get('/', function(req, res, next) {
 	});
 });
 
+/*********************/
+/* GET the main setup information. */
+/*********************/
+router.get('/main', function(req, res, next) {
+	// Query db using mongoose find method
+	Setup.findOne({name: 'main'}, function (err, setup) {
+		// Return any errors
+		if (err) { return next(err); }
+		// If there are no errors, return the list of setup info
+		return res.json(setup);
+	});
+});
+
+/*********************/
+/* GET route to check if setup exists information. */
+/*********************/
+router.get('/exists', function(req, res, next) {
+	// Query db using mongoose find method
+	Setup.findOne({name: 'main'}, function (err, setup) {
+		// Return any errors
+		if (err) { return next(err); }
+
+		if (!setup) { return res.send(false); } else { return res.send(setup.isComplete); }
+		// If there are no errors, return the list of setup info
+
+	});
+
+});
+
+
 /********************/
 /* POST a setup */
 /********************/
@@ -169,7 +199,7 @@ router.post('/', function (req, res, next) {
 				if (req.body.isSiteAdmin) { user.isSiteAdmin = req.body.isSiteAdmin; }
 
 				// Add role if set in form
-				if (req.body.role && user.roles.indexOf('admin') > -1) { user.roles.push('admin'); }
+				if (req.body.role && user.roles.indexOf('admin') == -1) { user.roles.push('admin'); }
 
 				// Save changes to user using the mongoose save method
 				user.save(function (err) {

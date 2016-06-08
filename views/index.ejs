@@ -1,11 +1,121 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+	<head>
+		<title>Helpdesk</title>
+		<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" />
+		<link href="/stylesheets/style.css" rel="stylesheet" />
+	</head>
+	<body ng-app="helpdesk">
+		<div class="container">
+			<div class="col-md-6 col-md-offset-3">
+				<ui-view></ui-view>
+			</div>
+		</div>
+
+	<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.10/angular.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
+	<script src="/javascripts/angularApp.js"></script>
+
+	<!-- Angular Ui Router Partials -->
+	<script type="text/ng-template" id="_home.html">
+		<div class="page-header">
+			<h1>{{setup.companyName}} helpdesk</h1>
+		</div>
+
+	</script>
+
+	<script type="text/ng-template" id="_setup.html">
+		<div class="page-header">
+			<h1>Helpdesk setup</h1>
+		</div>
+
+		<form style="margin-top: 30px;" ng-submit="completeSetup()">
+			<div class="row">
+				<div class="col-md-7">
+					<h3>Create an admin user</h3>
+
+					<div class="col-md-11 col-md-offset-1">
+						<div class="form-group">
+							<input type="text" class="form-control" ng-model="first" placeholder="First name" required />
+						</div>
+						<div class="form-group">
+							<input type="text" class="form-control" ng-model="last" placeholder="Last name" required />
+						</div>
+						<div class="form-group">
+							<input type="email" class="form-control" ng-model="email" placeholder="E-mail" required />
+						</div>
+						<div class="form-group">
+							<input type="text" class="form-control" ng-model="jobTitle" placeholder="Job title" />
+						</div>
+						<div class="form-group">
+							<div class="row">
+								<div class="col-md-7">
+									<input type="text" class="form-control" ng-model="phoneNumber" placeholder="Phone number" />
+								</div>
+								<div class="col-md-5">
+									<input type="text" class="form-control" ng-model="phoneExt" placeholder="Ext"  />
+								</div>
+							</div>
+
+
+						</div>
+						<hr />
+						<div class="form-group">
+							<input type="text" class="form-control" ng-model="username" placeholder="Username" required />
+						</div>
+
+						<div class="form-group">
+							<input type="password" class="form-control" ng-model="password" placeholder="Password" required />
+						</div>
+
+						<div class="form-group">
+							<input type="password" class="form-control" ng-model="passwordConfirm" placeholder="Confirm password" required />
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-5">
+					<h3>Company Info</h3>
+
+					<div class="col-md-11 col-md-offset-1">
+						<div class="form-group">
+							<input type="text" class="form-control" ng-model="companyName" placeholder="CompanyName" required />
+						</div>
+					</div>
+					<br /><br />
+					<h3>Mail Settings</h3>
+
+					<div class="col-md-11 col-md-offset-1">
+						<label>Smtp server</label>
+						<div class="form-group">
+							<input type="text" class="form-control" ng-model="smtpServer" placeholder="ex. smtp.server.com" required />
+						</div>
+
+						<label>Smtp user</label>
+						<div class="form-group">
+							<input type="text" class="form-control" ng-model="smtpUser" placeholder="ex. user@server.com" required />
+						</div>
+
+						<label>Smtp user password</label>
+						<div class="form-group">
+							<input type="password" class="form-control" ng-model="smtpPw" placeholder="password" required />
+						</div>
+						<div class="form-group">
+							<input type="password" class="form-control" ng-model="smtpPwConfirm" placeholder="confirm password" required />
+						</div>
+
+						<button type="submit" class="btn btn-primary">Complete the setup</button>
+					</div>
+
+
+				</div>
+
+			</div>
+		</form>
+
+	</script>
+	</body>
 </html>
