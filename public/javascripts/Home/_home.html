@@ -1,0 +1,13 @@
+<!-- _home.html -->
+<div class="page-header">
+	<h1>{{setup.companyName}} helpdesk</h1>
+</div>
+
+<div ng-show="isLoggedIn()">
+	<span ng-show="hasRole('user')">You have been granted 'user' access.</span>
+	<span ng-hide="hasRole('user')">Your access request has been sent to the helpdesk administrator.  It can take up to 24hrs for access to be granted.  You will get an e-mail when your access has been confirmed.</span>
+</div>
+
+<div ng-hide="isLoggedIn()">
+	<h3>You need to <a href="/#/login">Log In</a> or <a href="/#/register">Register</a> before you can use this app.</h3>
+</div>

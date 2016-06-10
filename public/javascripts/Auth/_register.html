@@ -1,0 +1,59 @@
+<!-- _register.html -->
+<div class="page-header">
+	<h1>{{setup.companyName}} helpdesk</h1>
+</div>
+
+<div ng-show="error" class="alert alert-danger row">
+	<span>{{error.message}}</span>
+</div>
+
+<form ng-submit="register()" style="margin-top:30px;">
+	<h3>Register</h3>
+
+	<div class="row">
+		<div class="col-md-11 col-md-offset-1">
+			<div class="form-group">
+				<input type="text" class="form-control" ng-model="user.first" placeholder="First name" required />
+			</div>
+
+			<div class="form-group">
+				<input type="text" class="form-control" ng-model="user.last" placeholder="Last name" required />
+			</div>
+
+			<div class="form-group">
+				<input type="email" class="form-control" ng-model="user.email" placeholder="E-mail" required />
+			</div>
+
+			<div class="form-group">
+				<input type="text" class="form-control" ng-model="user.jobTitle" placeholder="Job title" />
+			</div>
+
+			<div class="form-group">
+				<div class="row">
+					<div class="col-md-7">
+						<input type="text" class="form-control" ng-model="user.phoneNumber" placeholder="Phone number" />
+					</div>
+					<div class="col-md-5">
+						<input type="text" class="form-control" ng-model="user.phoneExt" placeholder="Ext"  />
+					</div>
+				</div>
+			</div>
+
+			<hr />
+
+			<div class="form-group">
+				<input type="text" class="form-control" ng-model="user.username" placeholder="Username" required />
+			</div>
+
+			<div class="form-group">
+				<input type="password" class="form-control" ng-model="user.password" placeholder="Password" required />
+			</div>
+
+			<div class="form-group">
+				<input type="password" class="form-control" ng-model="user.passwordConfirm" placeholder="Confirm password" required />
+			</div>
+
+			<button type="submit" class="btn btn-primary">Register</button>
+		</div>
+	</div>
+</form>

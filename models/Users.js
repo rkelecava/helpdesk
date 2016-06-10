@@ -72,7 +72,8 @@ UserSchema.methods.sendMailAdmin = function (setup, pw, mail) {
     	to: mail[0].to, // list of receivers
     	subject: mail[0].subject, // Subject line
     	text: mail[0].plainText, // plaintext body
-    	html: '<a href="http://localhost/#/confirm/'+this._id+'">Confirm</a> OR <a href="http://localhost/#/deny/'+this._id+'">Deny</a>' // html body
+    	html: '<a href="http://localhost:3000/#/confirm/'+this._id+'/confirm">Confirm</a> OR <a href="http://localhost:3000/#/deny/'+this._id+'/deny">Deny</a>' // html body
+	//	html: '<a href="http://localhost:3000/#/home">Confirm or Deny</a>'
 	};
 
 	// send mail with defined transport object

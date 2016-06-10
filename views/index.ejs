@@ -7,115 +7,40 @@
 	</head>
 	<body ng-app="helpdesk">
 		<div class="container">
+			<%- include nav.ejs %>
 			<div class="col-md-6 col-md-offset-3">
 				<ui-view></ui-view>
 			</div>
+
 		</div>
+
 
 	<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
 	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.10/angular.min.js"></script>
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
-	<script src="/javascripts/angularApp.js"></script>
 
-	<!-- Angular Ui Router Partials -->
-	<script type="text/ng-template" id="_home.html">
-		<div class="page-header">
-			<h1>{{setup.companyName}} helpdesk</h1>
-		</div>
+<!-- Angular App -->
+	<!-- Modules -->
+	<script src="/javascripts/app.js"></script>
 
-	</script>
+	<!-- Services -->
+	<script src="/javascripts/Setup/SetupService.js"></script>
+	<script src="/javascripts/Auth/AuthService.js"></script>
 
-	<script type="text/ng-template" id="_setup.html">
-		<div class="page-header">
-			<h1>Helpdesk setup</h1>
-		</div>
+	<!-- Routes -->
+	<script src="/javascripts/Shared/Routes.js"></script>
 
-		<form style="margin-top: 30px;" ng-submit="completeSetup()">
-			<div class="row">
-				<div class="col-md-7">
-					<h3>Create an admin user</h3>
+	<!-- Controllers -->
+	<script src="/javascripts/Home/HomeController.js"></script>
+	<script src="/javascripts/Setup/SetupController.js"></script>
+	<script src="/javascripts/Auth/AuthController.js"></script>
+	<script src="/javascripts/Nav/NavController.js"></script>
 
-					<div class="col-md-11 col-md-offset-1">
-						<div class="form-group">
-							<input type="text" class="form-control" ng-model="first" placeholder="First name" required />
-						</div>
-						<div class="form-group">
-							<input type="text" class="form-control" ng-model="last" placeholder="Last name" required />
-						</div>
-						<div class="form-group">
-							<input type="email" class="form-control" ng-model="email" placeholder="E-mail" required />
-						</div>
-						<div class="form-group">
-							<input type="text" class="form-control" ng-model="jobTitle" placeholder="Job title" />
-						</div>
-						<div class="form-group">
-							<div class="row">
-								<div class="col-md-7">
-									<input type="text" class="form-control" ng-model="phoneNumber" placeholder="Phone number" />
-								</div>
-								<div class="col-md-5">
-									<input type="text" class="form-control" ng-model="phoneExt" placeholder="Ext"  />
-								</div>
-							</div>
+	<!-- Directives -->
 
+<!-- Angular App -->
 
-						</div>
-						<hr />
-						<div class="form-group">
-							<input type="text" class="form-control" ng-model="username" placeholder="Username" required />
-						</div>
-
-						<div class="form-group">
-							<input type="password" class="form-control" ng-model="password" placeholder="Password" required />
-						</div>
-
-						<div class="form-group">
-							<input type="password" class="form-control" ng-model="passwordConfirm" placeholder="Confirm password" required />
-						</div>
-					</div>
-				</div>
-
-				<div class="col-md-5">
-					<h3>Company Info</h3>
-
-					<div class="col-md-11 col-md-offset-1">
-						<div class="form-group">
-							<input type="text" class="form-control" ng-model="companyName" placeholder="CompanyName" required />
-						</div>
-					</div>
-					<br /><br />
-					<h3>Mail Settings</h3>
-
-					<div class="col-md-11 col-md-offset-1">
-						<label>Smtp server</label>
-						<div class="form-group">
-							<input type="text" class="form-control" ng-model="smtpServer" placeholder="ex. smtp.server.com" required />
-						</div>
-
-						<label>Smtp user</label>
-						<div class="form-group">
-							<input type="text" class="form-control" ng-model="smtpUser" placeholder="ex. user@server.com" required />
-						</div>
-
-						<label>Smtp user password</label>
-						<div class="form-group">
-							<input type="password" class="form-control" ng-model="smtpPw" placeholder="password" required />
-						</div>
-						<div class="form-group">
-							<input type="password" class="form-control" ng-model="smtpPwConfirm" placeholder="confirm password" required />
-						</div>
-
-						<button type="submit" class="btn btn-primary">Complete the setup</button>
-					</div>
-
-
-				</div>
-
-			</div>
-		</form>
-
-	</script>
 	</body>
 </html>
